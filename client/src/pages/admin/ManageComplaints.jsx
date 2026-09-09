@@ -328,7 +328,7 @@ export default function ManageComplaints() {
 
                         <img
                           className="admin-complaint-image"
-                          src={`http://localhost:5000/uploads/${c.image}`}
+                          src={`https://civicfix-0tmy.onrender.com/uploads/${c.image}`}
                           alt="Complaint evidence"
                         />
 
