@@ -3,38 +3,107 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 export default function Register() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
   const navigate = useNavigate();
 
   const submit = async (e) => {
     e.preventDefault();
+    setMessage("");
+
     try {
-      await api.post("/auth/register", form);
-      setMessage("Registration successful. Please login.");
-      setTimeout(() => navigate("/login"), 800);
+      await api.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      navigate("/login");
     } catch (err) {
-      setMessage(err.response?.data?.message || "Registration failed");
+      setMessage(
+        err.response?.data?.message || "Registration failed"
+      );
     }
   };
 
   return (
-    <div className="auth-page">
-      <form className="form-card" onSubmit={submit}>
-        <h2>Create Account</h2>
-        <p className="muted">Join CivicFix and report civic problems.</p>
+    <main className="auth-page">
+      <form className="auth-card" onSubmit={submit}>
 
-        <input placeholder="Full name" value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })} />
-        <input type="email" placeholder="Email" value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <input type="password" placeholder="Password" value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <div className="auth-logo">
+          🏙️
+        </div>
 
-        <button className="btn primary full">Register</button>
-        {message && <p className="message">{message}</p>}
-        <p className="center">Already have an account? <Link to="/login">Login</Link></p>
+        <h1>Create Account</h1>
+
+        <p className="auth-subtitle">
+          Join CivicFix and report civic problems
+        </p>
+
+        <div className="auth-form">
+
+          <label>
+            Full Name
+
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </label>
+
+          <label>
+            Email
+
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </label>
+
+          <label>
+            Password
+
+            <input
+              type="password"
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+
+          <button
+            type="submit"
+            className="auth-button"
+          >
+            Create Account →
+          </button>
+
+        </div>
+
+        {message && (
+          <p className="error">
+            {message}
+          </p>
+        )}
+
+        <div className="auth-footer">
+          Already have an account?{" "}
+          <Link to="/login">
+            Login
+          </Link>
+        </div>
+
       </form>
-    </div>
+    </main>
   );
 }

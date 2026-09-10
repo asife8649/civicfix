@@ -7,35 +7,97 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
   const { loginUser } = useAuth();
   const navigate = useNavigate();
 
   const submit = async (e) => {
     e.preventDefault();
+    setMessage("");
+
     try {
-      const { data } = await api.post("/auth/login", { email, password });
+      const { data } = await api.post("/auth/login", {
+        email,
+        password,
+      });
+
       loginUser(data);
-      navigate(data.user.role === "admin" ? "/admin" : "/dashboard");
+
+      navigate(
+        data.user.role === "admin"
+          ? "/admin"
+          : "/dashboard"
+      );
     } catch (err) {
-      setMessage(err.response?.data?.message || "Login failed");
+      setMessage(
+        err.response?.data?.message || "Login failed"
+      );
     }
   };
 
   return (
-    <div className="auth-page">
-      <form className="form-card" onSubmit={submit}>
-        <h2>Welcome Back</h2>
-        <p className="muted">Login to manage your CivicFix complaints.</p>
+    <main className="auth-page">
+      <form className="auth-card" onSubmit={submit}>
 
-        <input type="email" placeholder="Email" value={email}
-          onChange={(e) => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" value={password}
-          onChange={(e) => setPassword(e.target.value)} />
+        <div className="auth-logo">
+          🏙️
+        </div>
 
-        <button className="btn primary full">Login</button>
-        {message && <p className="error">{message}</p>}
-        <p className="center">New user? <Link to="/register">Create account</Link></p>
+        <h1>Welcome Back</h1>
+
+        <p className="auth-subtitle">
+          Login to your CivicFix account
+        </p>
+
+        <div className="auth-form">
+
+          <label>
+            Email
+
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </label>
+
+          <label>
+            Password
+
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+
+          <button
+            type="submit"
+            className="auth-button"
+          >
+            Login →
+          </button>
+
+        </div>
+
+        {message && (
+          <p className="error">
+            {message}
+          </p>
+        )}
+
+        <div className="auth-footer">
+          New user?{" "}
+          <Link to="/register">
+            Create account
+          </Link>
+        </div>
+
       </form>
-    </div>
+    </main>
   );
 }
