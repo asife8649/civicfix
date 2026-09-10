@@ -20,11 +20,24 @@ export default function Navbar() {
           <span>CivicFix</span>
         </Link>
 
+
         {/* Navigation */}
         <div className="navbar-links">
 
           <Link to="/">
             Home
+          </Link>
+
+          <Link to="/about">
+            About
+          </Link>
+
+          <Link to="/reports">
+            Reports
+          </Link>
+
+          <Link to="/contact">
+            Contact
           </Link>
 
           {user && (
@@ -52,6 +65,7 @@ export default function Navbar() {
           )}
 
         </div>
+
 
         {/* User Section */}
         <div className="navbar-user">

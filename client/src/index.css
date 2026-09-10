@@ -2642,3 +2642,223 @@ button.delete:hover {
     margin-top: 15px;
   }
 }
+/* =========================================
+   SIMPLE CIVICFIX HOME PAGE
+========================================= */
+
+.simple-home {
+  min-height: calc(100vh - 70px);
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f8fafc 100%
+  );
+  padding: 40px 24px 60px;
+}
+
+
+/* Hero */
+
+.simple-hero {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 45px 20px 35px;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 7px 13px;
+  border-radius: 20px;
+  background: #eaf3ff;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.simple-hero h1 {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.15;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -1.5px;
+}
+
+.simple-hero h1 span {
+  color: #2563eb;
+}
+
+.simple-hero-text {
+  max-width: 680px;
+  margin: 16px auto 25px;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+
+/* Buttons */
+
+.simple-hero-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.simple-primary-btn,
+.simple-secondary-btn {
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.simple-primary-btn {
+  background: #2563eb;
+  color: white;
+  border: 1px solid #2563eb;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+}
+
+.simple-primary-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.simple-secondary-btn {
+  background: white;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.simple-secondary-btn:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+
+/* Feature Cards */
+
+.simple-features {
+  max-width: 1050px;
+  margin: 20px auto 0;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.simple-feature-card {
+  background: white;
+  border: 1px solid #edf0f4;
+  border-radius: 9px;
+  padding: 18px 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.simple-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(15, 23, 42, 0.08);
+}
+
+.simple-feature-icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  font-size: 17px;
+}
+
+.report-icon {
+  background: #d1fae5;
+}
+
+.track-icon {
+  background: #dbeafe;
+}
+
+.impact-icon {
+  background: #ede9fe;
+}
+
+.simple-feature-card h3 {
+  margin: 0 0 3px;
+  color: #1f2937;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.simple-feature-card p {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+  .simple-home {
+    padding: 25px 16px 40px;
+  }
+
+  .simple-hero {
+    padding: 35px 10px 25px;
+  }
+
+  .simple-hero h1 {
+    font-size: 34px;
+  }
+
+  .simple-hero-text {
+    font-size: 14px;
+  }
+
+  .simple-features {
+    grid-template-columns: 1fr;
+  }
+
+  .simple-feature-card {
+    padding: 16px;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .simple-hero h1 {
+    font-size: 29px;
+  }
+
+  .simple-hero-text br {
+    display: none;
+  }
+
+  .simple-primary-btn,
+  .simple-secondary-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+}

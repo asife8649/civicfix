@@ -9,89 +9,49 @@ export default function Home() {
     <>
       <Navbar />
 
-      <main className="home-page">
+      <main className="simple-home">
 
         {/* Hero Section */}
-        <section className="hero-section">
+        <section className="simple-hero">
 
-          <div className="hero-content">
-
-            <p className="eyebrow">
-              SMART CIVIC COMPLAINT SYSTEM
-            </p>
-
-            <h1>
-              Report Problems.
-              <br />
-              Improve Your Community.
-            </h1>
-
-            <p className="hero-description">
-              CivicFix helps citizens report local problems
-              such as road damage, electricity issues,
-              water problems and garbage.
-            </p>
-
-            <div className="hero-buttons">
-
-              {/* Citizen Buttons */}
-              {user?.role !== "admin" && (
-                <>
-                  <Link
-                    to="/create-complaint"
-                    className="primary-btn"
-                  >
-                    📝 Report a Problem
-                  </Link>
-
-                  <Link
-                    to="/my-complaints"
-                    className="secondary-btn"
-                  >
-                    View My Complaints
-                  </Link>
-                </>
-              )}
-
-              {/* Admin Button */}
-              {user?.role === "admin" && (
-                <Link
-                  to="/admin/complaints"
-                  className="primary-btn"
-                >
-                  📋 Manage Complaints
-                </Link>
-              )}
-
-            </div>
-
+          <div className="hero-badge">
+            Clean • Safe • Better Together
           </div>
 
+          <h1>
+            Let’s Build a Better{" "}
+            <span>Community</span>
+          </h1>
 
-          {/* Hero Card */}
-          <div className="hero-visual">
+          <p className="simple-hero-text">
+            Report civic issues, track progress, and make a real impact
+            in your area.
+            <br />
+            Together we can create cleaner, safer, and more livable
+            neighborhoods.
+          </p>
 
-            <div className="hero-card">
+          <div className="simple-hero-buttons">
 
-              <div className="hero-card-icon">
-                📍
-              </div>
+            {user?.role === "admin" ? (
+              <Link
+                to="/admin/complaints"
+                className="simple-primary-btn"
+              >
+                📋 Manage Complaints
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/create-complaint"
+                  className="simple-primary-btn"
+                >
+                  📝 Report an Issue
+                </Link>
 
-              <h3>
-                Report Local Issues
-              </h3>
-
-              <p>
-                Citizens can submit complaints
-                with images and current location.
-              </p>
-
-              <div className="hero-mini-status">
-                <span>●</span>
-                Complaint Tracking
-              </div>
-
-            </div>
+                
+              </>
+            )}
 
           </div>
 
@@ -99,143 +59,57 @@ export default function Home() {
 
 
         {/* Features */}
-        <section className="features-section">
+        <section className="simple-features">
 
-          <div className="section-heading">
+          <div className="simple-feature-card">
 
-            <p className="eyebrow">
-              HOW IT WORKS
-            </p>
-
-            <h2>
-              Making civic reporting simple
-            </h2>
-
-            <p>
-              Report an issue in a few simple steps
-              and track its progress.
-            </p>
-
-          </div>
-
-
-          <div className="feature-grid">
-
-            <div className="feature-card">
-
-              <div className="feature-icon">
-                📝
-              </div>
-
-              <h3>
-                Submit Complaint
-              </h3>
-
-              <p>
-                Describe the problem and select
-                the appropriate category.
-              </p>
-
+            <div className="simple-feature-icon report-icon">
+              📝
             </div>
 
-
-            <div className="feature-card">
-
-              <div className="feature-icon">
-                📷
-              </div>
-
-              <h3>
-                Add Evidence
-              </h3>
+            <div>
+              <h3>Report</h3>
 
               <p>
-                Upload an image to clearly show
-                the problem.
+                Quick and easy reporting
               </p>
-
-            </div>
-
-
-            <div className="feature-card">
-
-              <div className="feature-icon">
-                📍
-              </div>
-
-              <h3>
-                Capture Location
-              </h3>
-
-              <p>
-                Automatically capture the location
-                of the reported issue.
-              </p>
-
-            </div>
-
-
-            <div className="feature-card">
-
-              <div className="feature-icon">
-                🔄
-              </div>
-
-              <h3>
-                Track Progress
-              </h3>
-
-              <p>
-                Check whether your complaint is
-                Pending, In Progress or Resolved.
-              </p>
-
             </div>
 
           </div>
 
-        </section>
 
+          <div className="simple-feature-card">
 
-        {/* Bottom CTA */}
-        <section className="home-cta">
+            <div className="simple-feature-icon track-icon">
+              🔄
+            </div>
 
-          <div>
+            <div>
+              <h3>Track</h3>
 
-            <h2>
-              {user?.role === "admin"
-                ? "Manage civic complaints efficiently."
-                : "See a problem in your area?"}
-            </h2>
-
-            <p>
-              {user?.role === "admin"
-                ? "Review citizen complaints and update their status."
-                : "Report it through CivicFix and help make your community better."}
-            </p>
+              <p>
+                Real-time updates
+              </p>
+            </div>
 
           </div>
 
 
-          {user?.role === "admin" ? (
+          <div className="simple-feature-card">
 
-            <Link
-              to="/admin/complaints"
-              className="primary-btn"
-            >
-              Manage Complaints →
-            </Link>
+            <div className="simple-feature-icon impact-icon">
+              ❤️
+            </div>
 
-          ) : (
+            <div>
+              <h3>Impact</h3>
 
-            <Link
-              to="/create-complaint"
-              className="primary-btn"
-            >
-              Get Started →
-            </Link>
+              <p>
+                Stronger communities
+              </p>
+            </div>
 
-          )}
+          </div>
 
         </section>
 
