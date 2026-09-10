@@ -398,20 +398,20 @@ export default function ManageComplaints() {
                       </h3>
 
                       {c.image ? (
-
-                        <img
-                          className="admin-complaint-image"
-                          src={`https://civicfix-0tmy.onrender.com/uploads/${c.image}`}
-                          alt="Complaint evidence"
-                        />
-
-                      ) : (
-
-                        <div className="no-image">
-                          No image uploaded
-                        </div>
-
-                      )}
+  <img
+    className="admin-complaint-image"
+    src={
+      c.image.startsWith("http")
+        ? c.image
+        : `https://civicfix-0tmy.onrender.com/uploads/${c.image}`
+    }
+    alt="Complaint evidence"
+  />
+) : (
+  <div className="no-image">
+    No image uploaded
+  </div>
+)}
 
                     </div>
 
