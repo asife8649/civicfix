@@ -7,7 +7,10 @@ export default function ManageComplaints() {
   const [message, setMessage] = useState("");
   const [filter, setFilter] = useState("All");
 
-  // Load complaints
+  // ========================================
+  // Load Complaints
+  // ========================================
+
   const loadComplaints = async () => {
     try {
       setMessage("");
@@ -18,8 +21,12 @@ export default function ManageComplaints() {
       );
 
       setComplaints(res.data);
+
     } catch (error) {
-      console.error("Load complaints error:", error);
+      console.error(
+        "Load complaints error:",
+        error
+      );
 
       setMessage(
         error.response?.data?.message ||
@@ -28,12 +35,20 @@ export default function ManageComplaints() {
     }
   };
 
+
   useEffect(() => {
     loadComplaints();
   }, []);
 
-  // Update status
-  const updateStatus = async (id, status) => {
+
+  // ========================================
+  // Update Status
+  // ========================================
+
+  const updateStatus = async (
+    id,
+    status
+  ) => {
     try {
       await api.put(
         `/complaints/${id}/status`,
@@ -42,8 +57,12 @@ export default function ManageComplaints() {
       );
 
       loadComplaints();
+
     } catch (error) {
-      console.error("Update status error:", error);
+      console.error(
+        "Update status error:",
+        error
+      );
 
       setMessage(
         error.response?.data?.message ||
@@ -52,8 +71,13 @@ export default function ManageComplaints() {
     }
   };
 
-  // Delete complaint
+
+  // ========================================
+  // Delete Complaint
+  // ========================================
+
   const remove = async (id) => {
+
     if (
       !window.confirm(
         "Are you sure you want to delete this complaint?"
@@ -69,8 +93,12 @@ export default function ManageComplaints() {
       );
 
       loadComplaints();
+
     } catch (error) {
-      console.error("Delete complaint error:", error);
+      console.error(
+        "Delete complaint error:",
+        error
+      );
 
       setMessage(
         error.response?.data?.message ||
@@ -79,53 +107,218 @@ export default function ManageComplaints() {
     }
   };
 
-  // Parse location
+
+  // ========================================
+  // Parse Location
+  // ========================================
+
   const getLocation = (details) => {
+
     if (!details) {
       return null;
     }
 
     try {
       return JSON.parse(details);
+
     } catch (error) {
-      console.error("Location parse error:", error);
+      console.error(
+        "Location parse error:",
+        error
+      );
+
       return null;
     }
   };
 
-  // Status class
-  const getStatusClass = (status) => {
-    if (status === "Resolved") {
+
+  // ========================================
+  // Format MySQL UTC DateTime → IST
+  // ========================================
+
+  const formatDateTime = (value) => {
+
+    if (!value) {
+      return "Not available";
+    }
+
+    try {
+
+      let date;
+
+      /*
+       * MySQL DATETIME usually comes as:
+       *
+       * 2026-09-10 17:59:10
+       *
+       * We explicitly treat it as UTC.
+       */
+
+      if (
+        typeof value === "string"
+      ) {
+
+        let dateString =
+          value.trim();
+
+        if (
+          dateString.includes("T")
+        ) {
+
+          /*
+           * ISO timestamp
+           */
+          if (
+            !dateString.endsWith("Z")
+          ) {
+            dateString += "Z";
+          }
+
+          date =
+            new Date(
+              dateString
+            );
+
+        } else {
+
+          /*
+           * MySQL DATETIME
+           *
+           * Convert:
+           * 2026-09-10 17:59:10
+           *
+           * to:
+           * 2026-09-10T17:59:10Z
+           */
+
+          date =
+            new Date(
+              dateString.replace(
+                " ",
+                "T"
+              ) + "Z"
+            );
+        }
+
+      } else {
+
+        /*
+         * If mysql2 returns a Date object
+         */
+        date =
+          new Date(value);
+
+      }
+
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return "Not available";
+      }
+
+
+      /*
+       * Always display in India time
+       */
+      return date.toLocaleString(
+        "en-IN",
+        {
+          timeZone:
+            "Asia/Kolkata",
+
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+
+          hour12: true
+        }
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Date formatting error:",
+        error
+      );
+
+      return "Not available";
+    }
+  };
+
+
+  // ========================================
+  // Status Class
+  // ========================================
+
+  const getStatusClass = (
+    status
+  ) => {
+
+    if (
+      status === "Resolved"
+    ) {
       return "admin-status resolved";
     }
 
-    if (status === "In Progress") {
+    if (
+      status === "In Progress"
+    ) {
       return "admin-status progress";
     }
 
     return "admin-status pending";
   };
 
-  // Filter complaints
+
+  // ========================================
+  // Filter Complaints
+  // ========================================
+
   const filteredComplaints =
     filter === "All"
       ? complaints
       : complaints.filter(
-          (complaint) => complaint.status === filter
+          (complaint) =>
+            complaint.status ===
+            filter
         );
 
-  // Status counts
-  const pendingCount = complaints.filter(
-    (c) => c.status === "Pending"
-  ).length;
 
-  const progressCount = complaints.filter(
-    (c) => c.status === "In Progress"
-  ).length;
+  // ========================================
+  // Status Counts
+  // ========================================
 
-  const resolvedCount = complaints.filter(
-    (c) => c.status === "Resolved"
-  ).length;
+  const pendingCount =
+    complaints.filter(
+      (c) =>
+        c.status === "Pending"
+    ).length;
+
+
+  const progressCount =
+    complaints.filter(
+      (c) =>
+        c.status === "In Progress"
+    ).length;
+
+
+  const resolvedCount =
+    complaints.filter(
+      (c) =>
+        c.status === "Resolved"
+    ).length;
+
+
+  // ========================================
+  // UI
+  // ========================================
 
   return (
     <>
@@ -133,11 +326,15 @@ export default function ManageComplaints() {
 
       <main className="admin-complaints-page">
 
-        {/* Header */}
+
+        {/* ==================================
+            HEADER
+        ================================== */}
 
         <div className="admin-page-header">
 
           <div>
+
             <p className="eyebrow">
               ADMIN PANEL
             </p>
@@ -147,29 +344,38 @@ export default function ManageComplaints() {
             </h1>
 
             <p>
-              Review citizen complaints, check
-              locations and update their status.
+              Review citizen complaints,
+              check locations and update
+              their status.
             </p>
+
           </div>
 
+
           <div className="complaint-count">
+
             <span>
               Showing
             </span>
 
             <strong>
-              {filteredComplaints.length}
+              {
+                filteredComplaints.length
+              }
             </strong>
 
             <small>
               of {complaints.length} complaints
             </small>
+
           </div>
 
         </div>
 
 
-        {/* Status Filters */}
+        {/* ==================================
+            STATUS FILTERS
+        ================================== */}
 
         <div className="admin-filter-bar">
 
@@ -179,11 +385,18 @@ export default function ManageComplaints() {
                 ? "filter-button active"
                 : "filter-button"
             }
-            onClick={() => setFilter("All")}
+            onClick={() =>
+              setFilter("All")
+            }
           >
             All
-            <span>{complaints.length}</span>
+
+            <span>
+              {complaints.length}
+            </span>
+
           </button>
+
 
           <button
             className={
@@ -191,11 +404,18 @@ export default function ManageComplaints() {
                 ? "filter-button active pending-filter"
                 : "filter-button"
             }
-            onClick={() => setFilter("Pending")}
+            onClick={() =>
+              setFilter("Pending")
+            }
           >
             ⏳ Pending
-            <span>{pendingCount}</span>
+
+            <span>
+              {pendingCount}
+            </span>
+
           </button>
+
 
           <button
             className={
@@ -203,11 +423,18 @@ export default function ManageComplaints() {
                 ? "filter-button active progress-filter"
                 : "filter-button"
             }
-            onClick={() => setFilter("In Progress")}
+            onClick={() =>
+              setFilter("In Progress")
+            }
           >
             🔄 In Progress
-            <span>{progressCount}</span>
+
+            <span>
+              {progressCount}
+            </span>
+
           </button>
+
 
           <button
             className={
@@ -215,25 +442,37 @@ export default function ManageComplaints() {
                 ? "filter-button active resolved-filter"
                 : "filter-button"
             }
-            onClick={() => setFilter("Resolved")}
+            onClick={() =>
+              setFilter("Resolved")
+            }
           >
             ✅ Resolved
-            <span>{resolvedCount}</span>
+
+            <span>
+              {resolvedCount}
+            </span>
+
           </button>
 
         </div>
 
 
-        {/* Error */}
+        {/* ==================================
+            ERROR
+        ================================== */}
 
         {message && (
+
           <div className="error">
             {message}
           </div>
+
         )}
 
 
-        {/* Empty */}
+        {/* ==================================
+            EMPTY
+        ================================== */}
 
         {filteredComplaints.length === 0 &&
           !message && (
@@ -255,341 +494,463 @@ export default function ManageComplaints() {
               </p>
 
             </div>
+
           )}
 
 
-        {/* Complaints */}
+        {/* ==================================
+            COMPLAINT LIST
+        ================================== */}
 
         {filteredComplaints.length > 0 && (
 
           <div className="admin-complaints-list">
 
-            {filteredComplaints.map((c) => {
+            {filteredComplaints.map(
+              (c) => {
 
-              const location =
-                getLocation(
-                  c.location_details
-                );
-
-              return (
-
-                <article
-                  className="admin-complaint-card"
-                  key={c.id}
-                >
-
-                  {/* Complaint Header */}
-
-                  <div className="admin-card-header">
-
-                    <div>
-
-                      <span className="admin-complaint-id">
-                        Complaint #{c.id}
-                      </span>
-
-                      <h2>
-                        {c.title}
-                      </h2>
-
-                    </div>
-
-                    <span
-                      className={getStatusClass(
-                        c.status
-                      )}
-                    >
-                      {c.status}
-                    </span>
-
-                  </div>
+                const location =
+                  getLocation(
+                    c.location_details
+                  );
 
 
-                  {/* Main Content */}
+                return (
 
-                  <div className="admin-card-body">
+                  <article
+                    className="admin-complaint-card"
+                    key={c.id}
+                  >
 
-                    {/* Complaint Info */}
 
-                    <div className="admin-section">
+                    {/* =========================
+                        HEADER
+                    ========================= */}
 
-                      <h3>
-                        Complaint Details
-                      </h3>
+                    <div className="admin-card-header">
 
-                      <p className="admin-description">
-                        {c.description}
-                      </p>
+                      <div>
 
-                      <div className="admin-meta">
-
-                        <span>
-                          🏷️{" "}
-                          <strong>
-                            Category:
-                          </strong>{" "}
-                          {c.category}
+                        <span className="admin-complaint-id">
+                          Complaint #{c.id}
                         </span>
 
-                        <span>
-                          🕒{" "}
-                          <strong>
-                            Submitted:
-                          </strong>{" "}
-                          {c.created_at
-                            ? new Date(
-                                c.created_at
-                              ).toLocaleString(
-                                "en-IN",
-                                {
-                                  dateStyle:
-                                    "medium",
-                                  timeStyle:
-                                    "short"
-                                }
-                              )
-                            : "Not available"}
-                        </span>
+                        <h2>
+                          {c.title}
+                        </h2>
 
                       </div>
 
-                    </div>
 
-
-                    {/* Citizen */}
-
-                    <div className="admin-section">
-
-                      <h3>
-                        Citizen
-                      </h3>
-
-                      <div className="citizen-info">
-
-                        <div className="citizen-avatar">
-                          {c.name
-                            ?.charAt(0)
-                            .toUpperCase()}
-                        </div>
-
-                        <div>
-
-                          <strong>
-                            {c.name}
-                          </strong>
-
-                          <small>
-                            {c.email}
-                          </small>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-
-                    {/* Image */}
-
-                    <div className="admin-section">
-
-                      <h3>
-                        Evidence
-                      </h3>
-
-                      {c.image ? (
-  <img
-    className="admin-complaint-image"
-    src={
-      c.image.startsWith("http")
-        ? c.image
-        : `https://civicfix-0tmy.onrender.com/uploads/${c.image}`
-    }
-    alt="Complaint evidence"
-  />
-) : (
-  <div className="no-image">
-    No image uploaded
-  </div>
-)}
-
-                    </div>
-
-
-                    {/* Location */}
-
-                    <div className="admin-section">
-
-                      <h3>
-                        📍 Location
-                      </h3>
-
-                      {location ? (
-
-                        <div className="admin-location">
-
-                          {location.village && (
-                            <div>
-                              <strong>
-                                Village:
-                              </strong>{" "}
-                              {location.village}
-                            </div>
-                          )}
-
-                          {location.area && (
-                            <div>
-                              <strong>
-                                Area:
-                              </strong>{" "}
-                              {location.area}
-                            </div>
-                          )}
-
-                          {location.postOffice && (
-                            <div>
-                              <strong>
-                                Post Office:
-                              </strong>{" "}
-                              {location.postOffice}
-                            </div>
-                          )}
-
-                          {location.policeStation && (
-                            <div>
-                              <strong>
-                                Police Station:
-                              </strong>{" "}
-                              {location.policeStation}
-                            </div>
-                          )}
-
-                          {location.city && (
-                            <div>
-                              <strong>
-                                City:
-                              </strong>{" "}
-                              {location.city}
-                            </div>
-                          )}
-
-                          {location.district && (
-                            <div>
-                              <strong>
-                                District:
-                              </strong>{" "}
-                              {location.district}
-                            </div>
-                          )}
-
-                          {location.state && (
-                            <div>
-                              <strong>
-                                State:
-                              </strong>{" "}
-                              {location.state}
-                            </div>
-                          )}
-
-                          {location.country && (
-                            <div>
-                              <strong>
-                                Country:
-                              </strong>{" "}
-                              {location.country}
-                            </div>
-                          )}
-
-                          {location.pin && (
-                            <div>
-                              <strong>
-                                PIN:
-                              </strong>{" "}
-                              {location.pin}
-                            </div>
-                          )}
-
-                        </div>
-
-                      ) : (
-
-                        <div className="no-location">
-                          No detailed location available
-                        </div>
-
-                      )}
-
-                      {c.latitude &&
-                        c.longitude && (
-
-                          <a
-                            className="map-button"
-                            href={`https://www.google.com/maps?q=${c.latitude},${c.longitude}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            🗺️ View on Google Maps
-                          </a>
-
-                        )}
-
-                    </div>
-
-                  </div>
-
-
-                  {/* Footer / Actions */}
-
-                  <div className="admin-card-footer">
-
-                    <div className="status-control">
-
-                      <label>
-                        Update Status
-                      </label>
-
-                      <select
-                        value={c.status}
-                        onChange={(e) =>
-                          updateStatus(
-                            c.id,
-                            e.target.value
+                      <span
+                        className={
+                          getStatusClass(
+                            c.status
                           )
                         }
                       >
-
-                        <option value="Pending">
-                          Pending
-                        </option>
-
-                        <option value="In Progress">
-                          In Progress
-                        </option>
-
-                        <option value="Resolved">
-                          Resolved
-                        </option>
-
-                      </select>
+                        {c.status}
+                      </span>
 
                     </div>
 
 
-                    <button
-                      className="delete admin-delete-btn"
-                      onClick={() =>
-                        remove(c.id)
-                      }
-                    >
-                      🗑️ Delete Complaint
-                    </button>
+                    {/* =========================
+                        BODY
+                    ========================= */}
 
-                  </div>
+                    <div className="admin-card-body">
 
-                </article>
 
-              );
-            })}
+                      {/* =======================
+                          COMPLAINT DETAILS
+                      ======================= */}
+
+                      <div className="admin-section">
+
+                        <h3>
+                          Complaint Details
+                        </h3>
+
+
+                        <p className="admin-description">
+                          {c.description}
+                        </p>
+
+
+                        <div className="admin-meta">
+
+                          <span>
+
+                            🏷️{" "}
+
+                            <strong>
+                              Category:
+                            </strong>{" "}
+
+                            {c.category}
+
+                          </span>
+
+                        </div>
+
+                      </div>
+
+
+                      {/* =======================
+                          CITIZEN
+                      ======================= */}
+
+                      <div className="admin-section">
+
+                        <h3>
+                          Citizen
+                        </h3>
+
+
+                        <div className="citizen-info">
+
+                          <div className="citizen-avatar">
+
+                            {c.name
+                              ?.charAt(0)
+                              .toUpperCase()}
+
+                          </div>
+
+
+                          <div>
+
+                            <strong>
+                              {c.name}
+                            </strong>
+
+                            <small>
+                              {c.email}
+                            </small>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+
+                      {/* =======================
+                          EVIDENCE
+                      ======================= */}
+
+                      <div className="admin-section">
+
+                        <h3>
+                          Evidence
+                        </h3>
+
+
+                        {c.image ? (
+
+                          <img
+                            className="admin-complaint-image"
+                            src={
+                              c.image.startsWith(
+                                "http"
+                              )
+                                ? c.image
+                                : `https://civicfix-0tmy.onrender.com/uploads/${c.image}`
+                            }
+                            alt="Complaint evidence"
+                          />
+
+                        ) : (
+
+                          <div className="no-image">
+                            No image uploaded
+                          </div>
+
+                        )}
+
+                      </div>
+
+
+                      {/* =======================
+                          LOCATION
+                      ======================= */}
+
+                      <div className="admin-section">
+
+                        <h3>
+                          📍 Location
+                        </h3>
+
+
+                        {location ? (
+
+                          <div className="admin-location">
+
+                            {location.village && (
+
+                              <div>
+                                <strong>
+                                  Village:
+                                </strong>{" "}
+                                {location.village}
+                              </div>
+
+                            )}
+
+
+                            {location.area && (
+
+                              <div>
+                                <strong>
+                                  Area:
+                                </strong>{" "}
+                                {location.area}
+                              </div>
+
+                            )}
+
+
+                            {location.postOffice && (
+
+                              <div>
+                                <strong>
+                                  Post Office:
+                                </strong>{" "}
+                                {location.postOffice}
+                              </div>
+
+                            )}
+
+
+                            {location.policeStation && (
+
+                              <div>
+                                <strong>
+                                  Police Station:
+                                </strong>{" "}
+                                {location.policeStation}
+                              </div>
+
+                            )}
+
+
+                            {location.city && (
+
+                              <div>
+                                <strong>
+                                  City:
+                                </strong>{" "}
+                                {location.city}
+                              </div>
+
+                            )}
+
+
+                            {location.district && (
+
+                              <div>
+                                <strong>
+                                  District:
+                                </strong>{" "}
+                                {location.district}
+                              </div>
+
+                            )}
+
+
+                            {location.state && (
+
+                              <div>
+                                <strong>
+                                  State:
+                                </strong>{" "}
+                                {location.state}
+                              </div>
+
+                            )}
+
+
+                            {location.country && (
+
+                              <div>
+                                <strong>
+                                  Country:
+                                </strong>{" "}
+                                {location.country}
+                              </div>
+
+                            )}
+
+
+                            {location.pin && (
+
+                              <div>
+                                <strong>
+                                  PIN:
+                                </strong>{" "}
+                                {location.pin}
+                              </div>
+
+                            )}
+
+                          </div>
+
+                        ) : (
+
+                          <div className="no-location">
+                            No detailed location available
+                          </div>
+
+                        )}
+
+
+                        {/* =======================
+                            GOOGLE MAP
+                        ======================= */}
+
+                        {c.latitude &&
+                          c.longitude && (
+
+                            <a
+                              className="map-button"
+                              href={`https://www.google.com/maps?q=${c.latitude},${c.longitude}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              🗺️ View on Google Maps
+                            </a>
+
+                          )}
+
+
+                        {/* =======================
+                            CAPTURE + SUBMITTED TIME
+                        ======================= */}
+
+                        <div className="complaint-times">
+
+                          {c.photo_captured_at && (
+
+                            <p>
+
+                              📷{" "}
+
+                              <strong>
+                                Photo Captured:
+                              </strong>{" "}
+
+                              {formatDateTime(
+                                c.photo_captured_at
+                              )}
+
+                            </p>
+
+                          )}
+
+
+                          {c.location_captured_at && (
+
+                            <p>
+
+                              📍{" "}
+
+                              <strong>
+                                Location Captured:
+                              </strong>{" "}
+
+                              {formatDateTime(
+                                c.location_captured_at
+                              )}
+
+                            </p>
+
+                          )}
+
+
+                          {c.created_at && (
+
+                            <p>
+
+                              🕒{" "}
+
+                              <strong>
+                                Submitted:
+                              </strong>{" "}
+
+                              {formatDateTime(
+                                c.created_at
+                              )}
+
+                            </p>
+
+                          )}
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+
+                    {/* =========================
+                        FOOTER
+                    ========================= */}
+
+                    <div className="admin-card-footer">
+
+                      <div className="status-control">
+
+                        <label>
+                          Update Status
+                        </label>
+
+
+                        <select
+                          value={
+                            c.status
+                          }
+                          onChange={(e) =>
+                            updateStatus(
+                              c.id,
+                              e.target.value
+                            )
+                          }
+                        >
+
+                          <option value="Pending">
+                            Pending
+                          </option>
+
+                          <option value="In Progress">
+                            In Progress
+                          </option>
+
+                          <option value="Resolved">
+                            Resolved
+                          </option>
+
+                        </select>
+
+                      </div>
+
+
+                      <button
+                        className="delete admin-delete-btn"
+                        onClick={() =>
+                          remove(c.id)
+                        }
+                      >
+                        🗑️ Delete Complaint
+                      </button>
+
+                    </div>
+
+                  </article>
+
+                );
+              }
+            )}
 
           </div>
 

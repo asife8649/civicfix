@@ -88,29 +88,166 @@ const createComplaint = async (req, res) => {
     description,
     category,
     latitude,
-    longitude
+    longitude,
+    photo_captured_at,
+    location_captured_at
   } = req.body;
 
   const userId = req.user.id;
 
-  // Cloudinary image URL
-  const image = req.file
-    ? req.file.cloudinaryUrl
-    : null;
 
-  // Validate required fields
-  if (!title || !description || !category) {
+  // ========================================
+  // Required Photo
+  // ========================================
+
+  if (!req.file || !req.file.cloudinaryUrl) {
     return res.status(400).json({
-      message: "Please fill all required fields"
+      message:
+        "Please take a live photo before submitting the complaint"
     });
   }
 
-  // Get detailed location
+
+  // ========================================
+  // Required Location
+  // ========================================
+
+  if (!latitude || !longitude) {
+    return res.status(400).json({
+      message:
+        "Please capture your current location before submitting the complaint"
+    });
+  }
+
+
+  // ========================================
+  // Required Capture Times
+  // ========================================
+
+  if (
+    !photo_captured_at ||
+    !location_captured_at
+  ) {
+    return res.status(400).json({
+      message:
+        "Photo and location capture time are required"
+    });
+  }
+
+
+  // ========================================
+  // Validate Latitude / Longitude
+  // ========================================
+
+  const lat = Number(latitude);
+  const lon = Number(longitude);
+
+  if (
+    Number.isNaN(lat) ||
+    Number.isNaN(lon)
+  ) {
+    return res.status(400).json({
+      message:
+        "Invalid location coordinates"
+    });
+  }
+
+  if (lat < -90 || lat > 90) {
+    return res.status(400).json({
+      message:
+        "Invalid latitude"
+    });
+  }
+
+  if (lon < -180 || lon > 180) {
+    return res.status(400).json({
+      message:
+        "Invalid longitude"
+    });
+  }
+
+
+  // ========================================
+  // Validate Required Complaint Fields
+  // ========================================
+
+  if (
+    !title ||
+    !description ||
+    !category
+  ) {
+    return res.status(400).json({
+      message:
+        "Please fill all required fields"
+    });
+  }
+
+
+  // ========================================
+  // Cloudinary Image URL
+  // ========================================
+
+  const image =
+    req.file.cloudinaryUrl;
+
+
+  // ========================================
+  // Get Detailed Location
+  // ========================================
+
   const locationDetails =
     await getLocationDetails(
-      latitude,
-      longitude
+      lat,
+      lon
     );
+
+
+  // ========================================
+  // Convert ISO timestamps to MySQL format
+  // ========================================
+
+  const convertToMySQLDateTime = (
+    isoDate
+  ) => {
+
+    const date = new Date(isoDate);
+
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    return date
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+  };
+
+
+  const photoCapturedAt =
+    convertToMySQLDateTime(
+      photo_captured_at
+    );
+
+  const locationCapturedAt =
+    convertToMySQLDateTime(
+      location_captured_at
+    );
+
+
+  if (
+    !photoCapturedAt ||
+    !locationCapturedAt
+  ) {
+    return res.status(400).json({
+      message:
+        "Invalid capture timestamp"
+    });
+  }
+
+
+  // ========================================
+  // Insert Complaint
+  // ========================================
 
   const sql = `
     INSERT INTO complaints
@@ -122,10 +259,13 @@ const createComplaint = async (req, res) => {
       image,
       latitude,
       longitude,
-      location_details
+      location_details,
+      photo_captured_at,
+      location_captured_at
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
+
 
   db.query(
     sql,
@@ -135,10 +275,13 @@ const createComplaint = async (req, res) => {
       description,
       category,
       image,
-      latitude || null,
-      longitude || null,
-      locationDetails
+      lat,
+      lon,
+      locationDetails,
+      photoCapturedAt,
+      locationCapturedAt
     ],
+
     (err, result) => {
 
       if (err) {
@@ -149,17 +292,22 @@ const createComplaint = async (req, res) => {
         );
 
         return res.status(500).json({
-          message: "Failed to create complaint"
+          message:
+            "Failed to create complaint"
         });
       }
 
+
       res.status(201).json({
+
         message:
           "Complaint created successfully",
 
         complaintId:
           result.insertId
+
       });
+
     }
   );
 };
@@ -183,6 +331,7 @@ const getMyComplaints = (req, res) => {
   db.query(
     sql,
     [userId],
+
     (err, results) => {
 
       if (err) {
@@ -193,11 +342,13 @@ const getMyComplaints = (req, res) => {
         );
 
         return res.status(500).json({
-          message: "Failed to fetch complaints"
+          message:
+            "Failed to fetch complaints"
         });
       }
 
       res.json(results);
+
     }
   );
 };
@@ -222,6 +373,7 @@ const getAllComplaints = (req, res) => {
 
   db.query(
     sql,
+
     (err, results) => {
 
       if (err) {
@@ -232,11 +384,13 @@ const getAllComplaints = (req, res) => {
         );
 
         return res.status(500).json({
-          message: "Failed to fetch complaints"
+          message:
+            "Failed to fetch complaints"
         });
       }
 
       res.json(results);
+
     }
   );
 };
@@ -265,9 +419,11 @@ const updateComplaintStatus = (
   ) {
 
     return res.status(400).json({
-      message: "Invalid status"
+      message:
+        "Invalid status"
     });
   }
+
 
   const sql = `
     UPDATE complaints
@@ -275,9 +431,11 @@ const updateComplaintStatus = (
     WHERE id = ?
   `;
 
+
   db.query(
     sql,
     [status, id],
+
     (err, result) => {
 
       if (err) {
@@ -297,6 +455,7 @@ const updateComplaintStatus = (
         message:
           "Complaint status updated successfully"
       });
+
     }
   );
 };
@@ -318,9 +477,11 @@ const deleteComplaint = (
     WHERE id = ?
   `;
 
+
   db.query(
     sql,
     [id],
+
     (err, result) => {
 
       if (err) {
@@ -340,6 +501,7 @@ const deleteComplaint = (
         message:
           "Complaint deleted successfully"
       });
+
     }
   );
 };
