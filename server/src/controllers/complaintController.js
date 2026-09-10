@@ -30,34 +30,42 @@ const getLocationDetails = async (latitude, longitude) => {
       return null;
     }
 
-    // Keep useful location information only
     const location = {
       village: address.village || address.hamlet || null,
+
       area:
         address.suburb ||
         address.neighbourhood ||
         address.residential ||
         null,
+
       postOffice: address.post_office || null,
+
       policeStation:
         address.police ||
         address.police_station ||
         null,
+
       city:
         address.city ||
         address.town ||
         address.municipality ||
         null,
+
       district:
         address.state_district ||
         address.district ||
         null,
+
       state: address.state || null,
+
       country: address.country || null,
+
       pin: address.postcode || null
     };
 
     return JSON.stringify(location);
+
   } catch (error) {
     console.error(
       "Reverse geocoding error:",
@@ -69,8 +77,12 @@ const getLocationDetails = async (latitude, longitude) => {
 };
 
 
-// Create complaint
+// ========================================
+// Create Complaint
+// ========================================
+
 const createComplaint = async (req, res) => {
+
   const {
     title,
     description,
@@ -81,9 +93,9 @@ const createComplaint = async (req, res) => {
 
   const userId = req.user.id;
 
-  // Uploaded image filename
+  // Cloudinary image URL
   const image = req.file
-    ? req.file.filename
+    ? req.file.cloudinaryUrl
     : null;
 
   // Validate required fields
@@ -128,7 +140,9 @@ const createComplaint = async (req, res) => {
       locationDetails
     ],
     (err, result) => {
+
       if (err) {
+
         console.error(
           "Create complaint error:",
           err
@@ -142,15 +156,21 @@ const createComplaint = async (req, res) => {
       res.status(201).json({
         message:
           "Complaint created successfully",
-        complaintId: result.insertId
+
+        complaintId:
+          result.insertId
       });
     }
   );
 };
 
 
-// Get user's complaints
+// ========================================
+// Get User's Complaints
+// ========================================
+
 const getMyComplaints = (req, res) => {
+
   const userId = req.user.id;
 
   const sql = `
@@ -164,7 +184,9 @@ const getMyComplaints = (req, res) => {
     sql,
     [userId],
     (err, results) => {
+
       if (err) {
+
         console.error(
           "Get my complaints error:",
           err
@@ -181,8 +203,12 @@ const getMyComplaints = (req, res) => {
 };
 
 
-// Get all complaints - Admin
+// ========================================
+// Get All Complaints - Admin
+// ========================================
+
 const getAllComplaints = (req, res) => {
+
   const sql = `
     SELECT
       complaints.*,
@@ -197,7 +223,9 @@ const getAllComplaints = (req, res) => {
   db.query(
     sql,
     (err, results) => {
+
       if (err) {
+
         console.error(
           "Get all complaints error:",
           err
@@ -214,11 +242,15 @@ const getAllComplaints = (req, res) => {
 };
 
 
-// Update complaint status - Admin
+// ========================================
+// Update Complaint Status - Admin
+// ========================================
+
 const updateComplaintStatus = (
   req,
   res
 ) => {
+
   const { status } = req.body;
   const { id } = req.params;
 
@@ -231,6 +263,7 @@ const updateComplaintStatus = (
   if (
     !allowedStatuses.includes(status)
   ) {
+
     return res.status(400).json({
       message: "Invalid status"
     });
@@ -246,7 +279,9 @@ const updateComplaintStatus = (
     sql,
     [status, id],
     (err, result) => {
+
       if (err) {
+
         console.error(
           "Update status error:",
           err
@@ -267,11 +302,15 @@ const updateComplaintStatus = (
 };
 
 
-// Delete complaint - Admin
+// ========================================
+// Delete Complaint - Admin
+// ========================================
+
 const deleteComplaint = (
   req,
   res
 ) => {
+
   const { id } = req.params;
 
   const sql = `
@@ -283,7 +322,9 @@ const deleteComplaint = (
     sql,
     [id],
     (err, result) => {
+
       if (err) {
+
         console.error(
           "Delete complaint error:",
           err
