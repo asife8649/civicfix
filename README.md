@@ -1,67 +1,76 @@
-# 🏙️ CivicFix
+# CivicFix 🏙️
 
 ### Simple Civic Complaint Management System
 
-CivicFix is a full-stack web application that allows citizens to report civic issues in their area and helps administrators manage, track, and resolve those complaints.
+CivicFix is a full-stack web application where citizens can report local civic problems and administrators can manage those complaints.
 
-The system allows citizens to capture a live photo using their device camera along with their current GPS location while submitting a complaint.
+For example, users can report problems like road damage, garbage, street lights, water leakage, and drainage issues.
 
-## 🌐 Live Demo
+---
 
-**Frontend:** https://civicfix-asife8649.vercel.app/
+## 🌐 Live Project
 
-**Backend API:** https://civicfix-0tmy.onrender.com/
+**Frontend:**  
+https://civicfix-asife8649.vercel.app/
 
-**GitHub:** https://github.com/asife8649/civicfix
+**Backend:**  
+https://civicfix-0tmy.onrender.com/
 
-## ✨ Features
+**GitHub:**  
+https://github.com/asife8649/civicfix
 
-### 👤 Citizen
-- User registration and login
-- JWT-based authentication
-- Create civic complaints
+---
+
+## ✨ Main Features
+
+### Citizen
+- Register and Login
+- Create a complaint
 - Select complaint category
-- Capture live photo using device camera
-- Capture current GPS location
-- Automatic photo and location timestamps
+- Capture a photo using the device camera
+- Capture current location
 - View submitted complaints
 - Track complaint status
-- View complaint details
 
-### 🛡️ Admin
-- Admin authentication
+### Admin
+- Login as Admin
 - View all complaints
-- View complaint images
-- View detailed complaint location
-- View photo captured time
-- View location captured time
-- View complaint submission time
+- View complaint photos
+- View complaint location
 - Update complaint status
 - Delete complaints
 - Filter complaints by status
 
-### 📸 Live Evidence Capture
+---
 
-When submitting a complaint, the application captures:
-- Live camera photo
-- Current GPS location
-- Photo capture time
-- Location capture time
-- Complaint submission time
+## 📸 Live Photo & Location
 
-Images are uploaded to Cloudinary and complaint information is stored in the database.
+When a user creates a complaint:
 
-> Camera and GPS capture improve the reliability of complaint evidence, but browser-based applications cannot completely prevent GPS spoofing or other manipulation.
+```text
+Create Complaint
+       ↓
+Capture Photo
+       ↓
+Capture Current Location
+       ↓
+Submit Complaint
+       ↓
+Admin Reviews Complaint
+```
 
-## 🛠️ Technology Stack
+The system stores the photo, location, and capture time with the complaint.
+
+---
+
+## 🛠️ Technologies Used
 
 ### Frontend
 - React.js
 - Vite
-- React Router
 - Axios
-- HTML5
-- CSS3
+- React Router
+- CSS
 
 ### Backend
 - Node.js
@@ -70,319 +79,120 @@ Images are uploaded to Cloudinary and complaint information is stored in the dat
 - JWT
 - bcryptjs
 - Multer
-- Streamifier
 
 ### Database
 - TiDB Cloud
-- MySQL-compatible database
-- MySQL 8.0 for local development
+- MySQL
 
-### Cloud Services
-- Vercel — Frontend deployment
-- Render — Backend deployment
-- Cloudinary — Image storage
-- TiDB Cloud — Production database
-- GitHub — Source code and version control
+### Other Services
+- Cloudinary — Image Storage
+- Vercel — Frontend Hosting
+- Render — Backend Hosting
+- GitHub — Code Management
 
-## 🏗️ System Architecture
+---
+
+## 🔐 Authentication
+
+The project uses **JWT authentication**.
+
+Passwords are encrypted using **bcryptjs** before storing them in the database.
+
+Admin-only features are protected using role-based access.
+
+---
+
+## 🔄 How the Project Works
 
 ```text
-                    ┌─────────────────────┐
-                    │       Citizen       │
-                    │   React + Vite      │
-                    └──────────┬──────────┘
-                               │ REST API
-                               ▼
-                    ┌─────────────────────┐
-                    │   Node.js + Express │
-                    │       Backend       │
-                    └─────────┬───────────┘
-                              │
-                  ┌───────────┴───────────┐
-                  ▼                       ▼
-        ┌─────────────────┐      ┌─────────────────┐
-        │   TiDB Cloud    │      │   Cloudinary    │
-        │    Database     │      │ Image Storage   │
-        └─────────────────┘      └─────────────────┘
+Citizen
+   ↓
+Login
+   ↓
+Create Complaint
+   ↓
+Photo + Location
+   ↓
+Backend API
+   ↓
+Database + Cloudinary
+   ↓
+Admin Dashboard
+   ↓
+Update Complaint Status
 ```
+
+---
 
 ## 📂 Project Structure
 
 ```text
 civicfix/
-├── client/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   │   └── admin/
-│   │   ├── services/
-│   │   ├── context/
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── package.json
-│   └── vite.config.js
-├── server/
-│   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── routes/
-│   │   └── server.js
-│   ├── uploads/
-│   ├── .env
-│   ├── .env.example
-│   └── package.json
-├── database/
-│   └── schema.sql
-├── .gitignore
+│
+├── client/       # React Frontend
+│
+├── server/       # Node.js Backend
+│
+├── database/     # Database Schema
+│
 └── README.md
 ```
 
-## 🔐 Authentication
+---
 
-CivicFix uses JWT (JSON Web Token) for authentication.
+## 🚀 Run Locally
 
-```text
-User
-  ↓
-Register / Login
-  ↓
-Backend validates credentials
-  ↓
-JWT token generated
-  ↓
-Token stored in browser
-  ↓
-Token sent with API requests
-  ↓
-Protected API access
-```
-
-Passwords are hashed using bcryptjs before being stored in the database.
-
-## 📸 Complaint Capture Flow
-
-```text
-Create Complaint
-       ↓
-Open Device Camera
-       ↓
-Capture Live Photo
-       ↓
-Capture Current GPS
-       ↓
-Record Photo & Location Time
-       ↓
-Upload Image to Cloudinary
-       ↓
-Save Complaint in TiDB
-       ↓
-Admin Reviews Complaint
-```
-
-## 🗄️ Database
-
-### Users
-Stores:
-- User ID
-- Name
-- Email
-- Password
-- Role
-- Account creation time
-
-### Complaints
-Stores:
-- Complaint ID
-- User ID
-- Title
-- Description
-- Category
-- Status
-- Image URL
-- Latitude
-- Longitude
-- Location details
-- Photo captured time
-- Location captured time
-- Submission time
-
-### Complaint Status
-
-```text
-Pending
-   ↓
-In Progress
-   ↓
-Resolved
-```
-
-## 🔌 API Endpoints
-
-### Authentication
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login user |
-
-### Complaints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/complaints` | Create a complaint |
-| GET | `/api/complaints/my` | Get user's complaints |
-| GET | `/api/complaints` | Get all complaints |
-| PUT | `/api/complaints/:id/status` | Update complaint status |
-| DELETE | `/api/complaints/:id` | Delete complaint |
-
-## ⚙️ Local Setup
-
-### 1. Clone Repository
-
-```bash
-git clone https://github.com/asife8649/civicfix.git
-cd civicfix
-```
-
-### 2. Install Backend
+### Backend
 
 ```bash
 cd server
 npm install
-```
-
-### 3. Configure Environment Variables
-
-Create `server/.env`:
-
-```env
-PORT=4000
-
-DB_HOST=your_database_host
-DB_PORT=4000
-DB_USER=your_database_user
-DB_PASSWORD=your_database_password
-DB_NAME=civicfix
-
-JWT_SECRET=your_jwt_secret
-
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
-
-**Never upload `.env` or any passwords/secrets to GitHub.**
-
-### 4. Setup Database
-
-Run:
-
-```text
-database/schema.sql
-```
-
-using your MySQL/TiDB-compatible database.
-
-### 5. Start Backend
-
-```bash
-cd server
 npm run dev
 ```
 
-Backend: `http://localhost:4000`
+Backend runs on:
 
-### 6. Install Frontend
+```text
+http://localhost:4000
+```
+
+### Frontend
 
 Open another terminal:
 
 ```bash
 cd client
 npm install
-```
-
-### 7. Start Frontend
-
-```bash
 npm run dev
 ```
 
-Frontend: `http://localhost:5173`
-
-## 🚀 Production Deployment
+Frontend runs on:
 
 ```text
-                    GitHub
-                       │
-              ┌────────┴────────┐
-              ▼                 ▼
-           Vercel             Render
-              │                 │
-              ▼                 ▼
-        React Frontend     Node.js Backend
-                                │
-                       ┌────────┴────────┐
-                       ▼                 ▼
-                  TiDB Cloud        Cloudinary
-                   Database        Image Storage
+http://localhost:5173
 ```
 
-### Frontend
-**Vercel:** https://civicfix-asife8649.vercel.app/
+---
 
-### Backend
-**Render:** https://civicfix-0tmy.onrender.com/
+## 🎯 Project Goal
 
-### Database
-**TiDB Cloud**
+The main goal of CivicFix is to make it easier for citizens to report civic problems and help administrators manage those complaints efficiently.
 
-### Image Storage
-**Cloudinary**
-
-## 🔒 Security
-
-- JWT authentication
-- Password hashing with bcryptjs
-- Protected API routes
-- Admin-only operations
-- Environment variables for sensitive information
-- Image type validation
-- Maximum image upload size
-- HTTPS in production
-
-## 🎯 Project Objective
-
-The goal of CivicFix is to provide a simple platform for citizens to report local civic problems and allow administrators to manage those complaints efficiently.
-
-Examples:
-- 🛣️ Road damage
-- 🗑️ Garbage problems
-- 💡 Street light issues
-- 💧 Water leakage
-- 🚰 Drainage problems
-- 🏗️ Public infrastructure damage
+---
 
 ## 🔮 Future Improvements
 
 - Email notifications
-- SMS notifications
-- Push notifications
-- Interactive complaint map
-- Advanced analytics dashboard
-- Complaint priority prediction using Machine Learning
+- Complaint map
+- Better admin analytics
+- Complaint priority system
 - Duplicate complaint detection
-- Department-wise complaint assignment
-- Citizen feedback and ratings
-- Progressive Web App (PWA)
+- Citizen feedback system
+
+---
 
 ## 👨‍💻 Developer
 
 **Asif Ekbal**
 
 Computer Science & Engineering Student
-
-## 📄 License
-
-This project is developed for educational, portfolio, and placement purposes.
