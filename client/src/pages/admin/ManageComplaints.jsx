@@ -5,6 +5,7 @@ import api, { authConfig } from "../../services/api";
 export default function ManageComplaints() {
   const [complaints, setComplaints] = useState([]);
   const [message, setMessage] = useState("");
+  const [filter, setFilter] = useState("All");
 
   // Load complaints
   const loadComplaints = async () => {
@@ -18,10 +19,7 @@ export default function ManageComplaints() {
 
       setComplaints(res.data);
     } catch (error) {
-      console.error(
-        "Load complaints error:",
-        error
-      );
+      console.error("Load complaints error:", error);
 
       setMessage(
         error.response?.data?.message ||
@@ -45,10 +43,7 @@ export default function ManageComplaints() {
 
       loadComplaints();
     } catch (error) {
-      console.error(
-        "Update status error:",
-        error
-      );
+      console.error("Update status error:", error);
 
       setMessage(
         error.response?.data?.message ||
@@ -75,10 +70,7 @@ export default function ManageComplaints() {
 
       loadComplaints();
     } catch (error) {
-      console.error(
-        "Delete complaint error:",
-        error
-      );
+      console.error("Delete complaint error:", error);
 
       setMessage(
         error.response?.data?.message ||
@@ -96,11 +88,7 @@ export default function ManageComplaints() {
     try {
       return JSON.parse(details);
     } catch (error) {
-      console.error(
-        "Location parse error:",
-        error
-      );
-
+      console.error("Location parse error:", error);
       return null;
     }
   };
@@ -118,6 +106,27 @@ export default function ManageComplaints() {
     return "admin-status pending";
   };
 
+  // Filter complaints
+  const filteredComplaints =
+    filter === "All"
+      ? complaints
+      : complaints.filter(
+          (complaint) => complaint.status === filter
+        );
+
+  // Status counts
+  const pendingCount = complaints.filter(
+    (c) => c.status === "Pending"
+  ).length;
+
+  const progressCount = complaints.filter(
+    (c) => c.status === "In Progress"
+  ).length;
+
+  const resolvedCount = complaints.filter(
+    (c) => c.status === "Resolved"
+  ).length;
+
   return (
     <>
       <Navbar />
@@ -125,10 +134,10 @@ export default function ManageComplaints() {
       <main className="admin-complaints-page">
 
         {/* Header */}
+
         <div className="admin-page-header">
 
           <div>
-
             <p className="eyebrow">
               ADMIN PANEL
             </p>
@@ -141,25 +150,82 @@ export default function ManageComplaints() {
               Review citizen complaints, check
               locations and update their status.
             </p>
-
           </div>
 
           <div className="complaint-count">
-
             <span>
-              Total
+              Showing
             </span>
 
             <strong>
-              {complaints.length}
+              {filteredComplaints.length}
             </strong>
 
+            <small>
+              of {complaints.length} complaints
+            </small>
           </div>
 
         </div>
 
 
+        {/* Status Filters */}
+
+        <div className="admin-filter-bar">
+
+          <button
+            className={
+              filter === "All"
+                ? "filter-button active"
+                : "filter-button"
+            }
+            onClick={() => setFilter("All")}
+          >
+            All
+            <span>{complaints.length}</span>
+          </button>
+
+          <button
+            className={
+              filter === "Pending"
+                ? "filter-button active pending-filter"
+                : "filter-button"
+            }
+            onClick={() => setFilter("Pending")}
+          >
+            ⏳ Pending
+            <span>{pendingCount}</span>
+          </button>
+
+          <button
+            className={
+              filter === "In Progress"
+                ? "filter-button active progress-filter"
+                : "filter-button"
+            }
+            onClick={() => setFilter("In Progress")}
+          >
+            🔄 In Progress
+            <span>{progressCount}</span>
+          </button>
+
+          <button
+            className={
+              filter === "Resolved"
+                ? "filter-button active resolved-filter"
+                : "filter-button"
+            }
+            onClick={() => setFilter("Resolved")}
+          >
+            ✅ Resolved
+            <span>{resolvedCount}</span>
+          </button>
+
+        </div>
+
+
         {/* Error */}
+
         {message && (
           <div className="error">
             {message}
@@ -168,7 +234,8 @@ export default function ManageComplaints() {
 
 
         {/* Empty */}
-        {complaints.length === 0 &&
+
+        {filteredComplaints.length === 0 &&
           !message && (
 
             <div className="complaints-empty">
@@ -182,21 +249,22 @@ export default function ManageComplaints() {
               </h3>
 
               <p>
-                There are currently no citizen
-                complaints to manage.
+                {filter === "All"
+                  ? "There are currently no citizen complaints to manage."
+                  : `There are no ${filter.toLowerCase()} complaints.`}
               </p>
 
             </div>
-
           )}
 
 
-        {/* Desktop / Tablet */}
-        {complaints.length > 0 && (
+        {/* Complaints */}
+
+        {filteredComplaints.length > 0 && (
 
           <div className="admin-complaints-list">
 
-            {complaints.map((c) => {
+            {filteredComplaints.map((c) => {
 
               const location =
                 getLocation(
@@ -211,6 +279,7 @@ export default function ManageComplaints() {
                 >
 
                   {/* Complaint Header */}
+
                   <div className="admin-card-header">
 
                     <div>
@@ -237,9 +306,11 @@ export default function ManageComplaints() {
 
 
                   {/* Main Content */}
+
                   <div className="admin-card-body">
 
                     {/* Complaint Info */}
+
                     <div className="admin-section">
 
                       <h3>
@@ -286,6 +357,7 @@ export default function ManageComplaints() {
 
 
                     {/* Citizen */}
+
                     <div className="admin-section">
 
                       <h3>
@@ -318,6 +390,7 @@ export default function ManageComplaints() {
 
 
                     {/* Image */}
+
                     <div className="admin-section">
 
                       <h3>
@@ -344,6 +417,7 @@ export default function ManageComplaints() {
 
 
                     {/* Location */}
+
                     <div className="admin-section">
 
                       <h3>
@@ -465,6 +539,7 @@ export default function ManageComplaints() {
 
 
                   {/* Footer / Actions */}
+
                   <div className="admin-card-footer">
 
                     <div className="status-control">
